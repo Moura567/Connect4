@@ -3,11 +3,10 @@ import random
 import pygame
 import sys
 import math
-
-BLUE = (0,0,255)
-BLACK = (0,0,0)
-RED = (255,0,0)
-YELLOW = (255,255,0)
+color1 = (0,0,255)
+color3 = (30,30,40)
+color2 =(42, 97, 255)
+color4 = (255,255,255)
 
 # Dimensions of board
 ROW_COUNT = 6
@@ -22,6 +21,17 @@ PLAYER_PIECE = 1
 AI_PIECE = 2
 
 WINDOW_LENGTH = 4
+
+SQUARESIZE = 100
+
+width = COLUMN_COUNT * SQUARESIZE
+height = (ROW_COUNT+1) * SQUARESIZE
+
+size = (width, height)
+
+RADIUS = int(SQUARESIZE/2 - 5)
+background_image = pygame.image.load("background.jpg")
+background_image = pygame.transform.scale(background_image, (width,height))
 
 # function that create the board fill in zero by shape of row_count and column_count
 def create_board():
@@ -296,75 +306,68 @@ def pick_best_move(board, piece):
 
     return best_col
 
+def draw_board(board, winner=None):
+	screen.blit(background_image, (0, 0))
+	for c in range(COLUMN_COUNT):
+		for r in range(ROW_COUNT):
+			#pygame.draw.rect(screen, color1, (c*SQUARESIZE, r*SQUARESIZE+SQUARESIZE, SQUARESIZE, SQUARESIZE))
+			pygame.draw.circle(screen, color3, (int(c*SQUARESIZE+SQUARESIZE/2), int(r*SQUARESIZE+SQUARESIZE+SQUARESIZE/2)), RADIUS)
 
-def draw_board(board):
-    # These lines draw the Connect Four board on the screen by drawing a blue rectangle for each cell
-    # and a black circle at the center of each cell to represent the empty spaces on the board.
-    for c in range(COLUMN_COUNT):
-        for r in range(ROW_COUNT):
-            pygame.draw.rect(screen, BLUE, (c * SQUARESIZE, r * SQUARESIZE + SQUARESIZE, SQUARESIZE, SQUARESIZE))
-            pygame.draw.circle(screen, BLACK, (
-            int(c * SQUARESIZE + SQUARESIZE / 2), int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
-    # These lines draw the pieces for the human and AI players on the board
-    # by drawing a red circle for the human player's piece and
-    # a yellow circle for the AI player's piece.
-    for c in range(COLUMN_COUNT):
-        for r in range(ROW_COUNT):
-            if board[r][c] == PLAYER_PIECE:
-                pygame.draw.circle(screen, RED, (
-                int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
-            elif board[r][c] == AI_PIECE:
-                pygame.draw.circle(screen, YELLOW, (
-                int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
-    pygame.display.update()
+	for c in range(COLUMN_COUNT):
+		for r in range(ROW_COUNT):
+			if board[r][c] == PLAYER_PIECE:
+				pygame.draw.circle(screen, color2, (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
+			elif board[r][c] == AI_PIECE:
+				pygame.draw.circle(screen, color4, (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
 
+	if winner is not None:
+	   if winner == PLAYER_PIECE:
+		   text = "Player 1 wins!"
+		   color = color2
+	   else:
+		   text = "Player 2 wins!"
+		   color = color4
+	   label = myfont.render(text, 1, color)
+	   text_bg = pygame.Rect(30, 0, 200, 50)
+	   #pygame.draw.rect(screen, color3, text_bg)
+	   screen.blit(label, (40, 10))
+	   pygame.display.flip()
+	   pygame.time.wait(3000)
+	pygame.display.update()
 
-##GUI
 board = create_board()
 print_board(board)
 game_over = False
 
 pygame.init()
-
-SQUARESIZE = 100
-
-width = COLUMN_COUNT * SQUARESIZE
-height = (ROW_COUNT + 1) * SQUARESIZE
-
-size = (width, height)
-
-RADIUS = int(SQUARESIZE / 2 - 5)
-
 screen = pygame.display.set_mode(size)
 draw_board(board)
 pygame.display.update()
 
-myfont = pygame.font.SysFont("monospace", 75)
+myfont = pygame.font.SysFont(None, 75)
 
 turn = random.randint(PLAYER, AI)
 
 while not game_over:
-    ##These lines check for the "QUIT" event, which is triggered
+    ##These lines check for the "QUIT" event, which is triggecolor2
     ## when the user clicks the "X" button in the top right corner of the game window.
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-        ## The pygame.MOUSEMOTION event is triggered when the user moves the mouse on the game window.
+        ## The pygame.MOUSEMOTION event is triggecolor2 when the user moves the mouse on the game window.
         ## These lines update the position of the player's piece on the screen to follow the mouse movement.
-        ## A black rectangle is drawn over the top of the previous position of the player's piece to erase it,
-        ## and a new red circle is drawn at the new position of the player's piece.
+        ## A color3 rectangle is drawn over the top of the previous position of the player's piece to erase it,
+        ## and a new color2 circle is drawn at the new position of the player's piece.
         if event.type == pygame.MOUSEMOTION:
-            pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
+            pygame.draw.rect(screen, color3, (0, 0, width, SQUARESIZE))
             posx = event.pos[0]
             if turn == PLAYER:
-                pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE / 2)), RADIUS)
+                pygame.draw.circle(screen, color2, (posx, int(SQUARESIZE / 2)), RADIUS)
 
         pygame.display.update()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
-        # print(event.pos)
-        # Ask for Player 1 Input
+            pygame.draw.rect(screen, color3, (0, 0, width, SQUARESIZE))
         # Ask for Player 1 Input
         ## If it is the human player's turn, a random column is selected for the player to drop their piece.
         ## The code waits for 1 second using `pygame.time.wait(1000)` to simulate the player thinking about their move.
@@ -379,37 +382,33 @@ while not game_over:
                 ## If theplayer has won, a message is displayed on the screen using the `myfont.render`
                 ## and `screen.blit` functions, and the `game_over` variable is set to `True`
                 if winning_move(board, PLAYER_PIECE):
-                    label = myfont.render("Player 1 wins!!", 1, RED)
-                    screen.blit(label, (40, 10))
+                    draw_board(board,winner=PLAYER_PIECE)
                     game_over = True
 
                 print_board(board)
                 draw_board(board)
                 turn += 1
                 turn = turn % 2
+			# # Ask for Player 2 Input
+			##If it is the AI player's turn and the game is not over,
+			## the AI selects the best move to make by calling the `pick_best_move` function.
+			## The code waits for 1 second using `pygame.time.wait(1000)` to simulate the AI thinking about its move.
+			## If the selected column is avalid location, the AI player drops its piece into the lowest empty row in that column.
+			## The code then checks if the AI player has won the game by calling the `winning_move` function. If the AI player has won,
+			## a message is displayed on the screen using the `myfont.render` and `screen.blit` functions,
+			## and the `game_over` variable is set to `True`.
+			## The `print_board` and `draw_board` functions are called to display the updated game board on the screen.
 
-        # # Ask for Player 2 Input
-        ##If it is the AI player's turn and the game is not over,
-        ## the AI selects the best move to make by calling the `pick_best_move` function.
-        ## The code waits for 1 second using `pygame.time.wait(1000)` to simulate the AI thinking about its move.
-        ## If the selected column is avalid location, the AI player drops its piece into the lowest empty row in that column.
-        ## The code then checks if the AI player has won the game by calling the `winning_move` function. If the AI player has won,
-        ## a message is displayed on the screen using the `myfont.render` and `screen.blit` functions,
-        ## and the `game_over` variable is set to `True`.
-        ## The `print_board` and `draw_board` functions are called to display the updated game board on the screen.
         if turn == AI and not game_over:
-
             pygame.time.wait(1000)
             col = pick_best_move(board, AI_PIECE)
 
             if is_valid_location(board, col):
-                # pygame.time.wait(500)
                 row = get_next_open_row(board, col)
                 drop_piece(board, row, col, AI_PIECE)
 
                 if winning_move(board, AI_PIECE):
-                    label = myfont.render("Player 2 wins!!", 1, YELLOW)
-                    screen.blit(label, (40, 10))
+                    draw_board(board,winner=AI_PIECE)
                     game_over = True
 
                 print_board(board)
@@ -418,14 +417,13 @@ while not game_over:
                 turn += 1
                 turn = turn % 2
 
-    if game_over:
-        pygame.time.wait(300000)
-        break
+        if game_over:
+            pygame.time.wait(300)
+            break
 
-    if is_terminal_node(board):
-        label = myfont.render("Game Over", 1, RED)
-        screen.blit(label, (150, 10))
-        game_over = True
+        if is_terminal_node(board):
+            label = myfont.render("Game Over", 1, color2)
+            screen.blit(label, (150,10))
+            game_over = True
 
-        pygame.display.update()
-        pygame.time.wait(3000)
+    pygame.display.update()
